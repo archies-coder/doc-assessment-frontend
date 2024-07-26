@@ -1,9 +1,9 @@
 import React, { useEffect, useState, useRef } from 'react';
 import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet';
-import 'leaflet/dist/leaflet.css';
 import { useMapEvents } from 'react-leaflet/hooks'
 import MarkerIcon from "./map-marker-svgrepo-com.svg"
 import L from 'leaflet';
+import 'leaflet/dist/leaflet.css';
 import "./App.css"
 
 const customIcon = new L.icon({
@@ -54,25 +54,6 @@ function LocationMarker({ popupProps, onClick, position, setPosition, weatherDat
   )
 }
 
-function MyComponent({ onClick }) {
-  const map = useMapEvents({
-
-    click: ({ latlng }) => {
-      console.log("Click Handler")
-      onClick({
-        lat: latlng.lat,
-        lon: latlng.lng
-      })
-      map.setView([latlng.lat, latlng.lng], map.getZoom())
-    },
-    locationfound: ({ latlng }) => {
-      map.setView([latlng.lat, latlng.lng], map.getZoom())
-      console.log('location found:', latlng)
-    },
-  })
-  return null
-}
-
 const App = () => {
   const [weatherData, setWeatherData] = useState(null);
   const [location, setLocation] = useState({ lat: 19.685263273173724, lon: 72.77755737304689 })
@@ -81,7 +62,6 @@ const App = () => {
 
   useEffect(() => {
     wsRef.current = new WebSocket('ws://localhost:8080');
-
     getLocation()
 
     return () => wsRef.current.close();
@@ -99,7 +79,7 @@ const App = () => {
       }
     };
 
-  }, [location.lat])
+  }, [location])
 
   function getLocation() {
     if (navigator.geolocation) {
@@ -116,25 +96,11 @@ const App = () => {
     }
   }
 
-  // if (!weatherData) return <div>Loading...</div>;
-
   const { temp_c, condition, precip_mm, wind_kph, humidity, air_quality } = weatherData?.current || {}
   const { name } = weatherData?.location || {}
 
   const { lat, lon } = location
 
-  const data = {
-    labels: ['Temperature'],
-    datasets: [
-      {
-        label: 'Weather Metrics',
-        data: [10, 15, 20],
-        fill: false,
-        borderColor: 'rgb(75, 192, 192)',
-        tension: 0.1
-      },
-    ],
-  };
   return (
     <div>
       <div>
@@ -163,22 +129,6 @@ const App = () => {
             url='http://{s}.google.com/vt/lyrs=s,h&x={x}&y={y}&z={z}'
             subdomains={['mt0', 'mt1', 'mt2', 'mt3']}
           />
-          {/* <Marker position={[lat, lon]}
-          >
-            {weatherData && <Popup>
-              <div>
-                <h2>
-                  <img src={condition.icon} alt="Weather icon" />
-                  {condition.text}</h2>
-                <h3>Location : {name}</h3>
-                <p>Temperature: {temp_c}°C</p>
-                <p>Precipitation: {precip_mm} mm</p>
-                <p>Wind Speed: {wind_kph} km/hr</p>
-                <p>Humidity: {humidity} %</p>
-                <p>Air quality (CO): {air_quality.co}</p>
-              </div>
-            </Popup>}
-          </Marker> */}
         </MapContainer>
       </div>
     </div>
